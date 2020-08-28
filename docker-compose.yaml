@@ -1,0 +1,30 @@
+version: '3.3'
+services:
+  bankdb:
+    container_name: bankdb
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    environment:
+      - MYSQL_USER=bank
+      - MYSQL_ROOT_PASSWORD=bank
+    ports:
+      - "3306:3306"
+  backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: sh run-local.sh
+    ports:
+      - 8080:8080
+    depends_on:
+      - "bankdb"
+    links:
+      - bankdb
+    environment:
+      - localhost=bankdb
+    stdin_open: true
